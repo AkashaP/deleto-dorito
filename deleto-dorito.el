@@ -163,18 +163,6 @@ This command assumes point is not in a string or comment."
           (kill-new (cadr kill-ring)))
       (dd-inject (current-kill 0)))))
 
-;; (defvar dd-inject-clear
-;;   '(" " "'" "`" "," "" "\"" "@" "[" "]" "{" "}"))
-
-;; (defvar dd-inject-clear-before
-;;   '(" " "(" "'" "`" "," "" "\"" "@" "[" "]" "{" "}"))
-
-;; (defvar dd-inject-clear-after
-;;   '(")" (string #\newline)))
-
-;; (defvar dd-inject-paste-before
-;;   '(" " ")" "'" "`" "," "" "\"" "@" "[" "]" "{" "}" ";"))
-
 (defun dd-inject (str)
   "Injects a symbol safely"
   (interactive)
@@ -188,40 +176,29 @@ This command assumes point is not in a string or comment."
         (cond
          ;; empty buffer
          ((and (not ops) (not ofs))
-          (print 1)
           (insert str))
          ;; empty list
          ((and (eq "(" ops)
                (eq ")" ofs))
-          (print 2)
           (insert str))
          ;; not code
          ((sp-point-in-string-or-comment)
-          (print 3)
           (insert str))
          ;; OK before
          ((string-match-p "[\s\\(\\'\\`\\,\\@\\{\\}]" ops)
-          ;;(member* ops dd-inject-clear-before :test #'equal)
-          (print 4)
           (insert str)
           (unless (string-match-p "[\)\s]" (string (following-char)))
-            ;;(member* (string (following-char)) dd-inject-clear-after :test #'equal)
             (insert " "))
           )
          ;; OK after
          ((string-match-p "[\)\s\n]" ofs)
-          ;;(member* ofs dd-inject-clear-after :test #'equal)
-          (print 5)
           (unless (string-match-p "[\s\\(\\'\\`\\,\\@\\{\\}]" (string (preceding-char)))
-            ;;(member* (string (preceding-char)) dd-inject-clear-before :test #'equal)
             (insert " "))
           (insert str)) 
          ;; blocked both sides; insert after blocked token.
          (t
-          (print 6)
           (re-search-forward "[\s\\)\\'\\\"\\`\\,\\@\\{\\}\\;]")
           (unless (string-match-p "[\s\\(\\'\\`\\,\\@\\{\\}]" (string (preceding-char)))
-            ;;(member* (string (preceding-char)) dd-inject-clear-before :test #'equal)
             (insert " "))
           (insert str)
           (insert " ")))))))
