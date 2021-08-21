@@ -1,6 +1,9 @@
 ;; More delete based commands for emacs
-;; mostly for keybinds, since smartparens does
-;; some finicky behaviour with the kill-ring.
+;; smartparens does  some finicky behaviour with the kill-ring,
+;; which messes with but doesn't fully isolate the yank system
+;;
+;; i'm not an expert at yanking but i feel like half its functionality
+;; is already encompassed by the undo system
 ;;
 ;; most commands are put in terms of delete-region which as of now
 ;; seems to be a native C function.
@@ -164,7 +167,13 @@ This command assumes point is not in a string or comment."
       (dd-inject (current-kill 0)))))
 
 (defun dd-inject (str)
-  "Injects a symbol safely"
+  "Injects a symbol safely into a sexp.
+   (aa|aa) => (aaaa ****|)
+   (aaaa| bbbb) => (aaaa ****| bbbb) ; note extra space
+   (|aaaa) => (****| aaaa)
+   (aaaa) => (aaaa ****|)
+   (|) => (****)
+   (aaaa)| => (aaaa) ****|"
   (interactive)
   (when kill-ring
     (if (region-active-p)
