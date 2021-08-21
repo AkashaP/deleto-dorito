@@ -183,34 +183,37 @@ This command assumes point is not in a string or comment."
       (let ((ops (string (preceding-char)))
             (ofs (string (following-char))))
         (cond
-         ;; empty buffer
-         ((and (not ops) (not ofs))
-          (insert str))
-         ;; empty list
-         ((and (eq "(" ops)
-               (eq ")" ofs))
-          (insert str))
-         ;; not code
-         ((sp-point-in-string-or-comment)
-          (insert str))
-         ;; OK before
-         ((string-match-p "[\s\\(\\'\\`\\,\\@\\{\\}]" ops)
-          (insert str)
-          (unless (string-match-p "[\)\s]" (string (following-char)))
-            (insert " "))
-          )
-         ;; OK after
-         ((string-match-p "[\)\s\n]" ofs)
-          (unless (string-match-p "[\s\\(\\'\\`\\,\\@\\{\\}]" (string (preceding-char)))
-            (insert " "))
-          (insert str)) 
-         ;; blocked both sides; insert after blocked token.
-         (t
-          (re-search-forward "[\s\\)\\'\\\"\\`\\,\\@\\{\\}\\;]")
-          (unless (string-match-p "[\s\\(\\'\\`\\,\\@\\{\\}]" (string (preceding-char)))
-            (insert " "))
-          (insert str)
-          (insert " ")))))))
+          ;; empty buffer
+          ((and (not ops) (not ofs))
+           (insert str))
+          ;; empty list
+          ((and (eq "(" ops)
+                (eq ")" ofs))
+           (insert str))
+          ;; not code
+          ((sp-point-in-string-or-comment)
+           (insert str))
+          ;; OK before
+          ((or (equal "\0" ops)
+               (string-match-p "[\s\\(\\'\\`\\,\\@\\{\\}]" ops))
+           (insert str)
+           (unless (string-match-p "[\)\s]" (string (following-char)))
+             (insert " "))
+           )
+          ;; OK after
+          ((or (equal "\0" ofs)
+               (string-match-p "[\)\s\n]" ofs))
+           (unless (string-match-p "[\s\\(\\'\\`\\,\\@\\{\\}]" (string (preceding-char)))
+             (insert " "))
+           (insert str))
+          ((equal "\0" (string (following-char))))
+          ;; blocked both sides; insert after blocked token.
+          (t
+           (re-search-forward "[\s\\)\\'\\\"\\`\\,\\@\\{\\}\\;]")
+           (unless (string-match-p "[\s\\(\\'\\`\\,\\@\\{\\}]" (string (preceding-char)))
+             (insert " "))
+           (insert str)
+           (insert " ")))))))
 
 
 
