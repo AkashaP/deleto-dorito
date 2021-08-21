@@ -101,15 +101,15 @@ This command assumes point is not in a string or comment."
     (setq cb (string (following-char)))
     (let* ((select-enable-clipboard nil))
       (cond
-       ((or (equal cb " ") (equal cb "\t") (equal cb "\n"))
-        (dd-forward-delete-whitespace))
-       ((equal cb ")")
-        (up-list)
-        (dd-backward-delete-sexp))
-       ((equal cb "(")
-        (dd-delete-sexp))
-       (t
-        (dd-delete-word))))))
+        ((or (equal cb " ") (equal cb "\t") (equal cb "\n"))
+         (dd-forward-delete-whitespace))
+        ((equal cb ")")
+         (sp-backward-up-sexp)
+         (dd-forward-delete-sexp))
+        ((equal cb "(")
+         (dd-delete-sexp))
+        (t
+         (dd-delete-word))))))
 
 (defun dd-backward-delete-word-or-whitespace-or-sexp ()
   (interactive)
@@ -118,15 +118,15 @@ This command assumes point is not in a string or comment."
     (setq cb (string (preceding-char)))
     (let* ((select-enable-clipboard nil))
       (cond
-       ((or (equal cb " ") (equal cb "\t") (equal cb "\n"))
-        (dd-backward-delete-whitespace))
-       ((equal cb "(")
-        (sp-up-sexp)
-        (dd-forward-delete-sexp))
-       ((equal cb ")")
-        (dd-backward-delete-sexp))
-       (t
-        (dd-backward-delete-word))))))
+        ((or (equal cb " ") (equal cb "\t") (equal cb "\n"))
+         (dd-backward-delete-whitespace))
+        ((equal cb "(")
+         (sp-up-sexp)
+         (dd-backward-delete-sexp))
+        ((equal cb ")")
+         (dd-backward-delete-sexp))
+        (t
+         (dd-backward-delete-word))))))
 
 ;; the dwim INTENSIFIES
 
@@ -214,3 +214,9 @@ This command assumes point is not in a string or comment."
 
 
 
+
+
+
+(provide 'deleto-dorito)
+
+;;; deleto-dorito.el ends here
