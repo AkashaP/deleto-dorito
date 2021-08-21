@@ -166,14 +166,14 @@ This command assumes point is not in a string or comment."
 ;; (defvar dd-inject-clear
 ;;   '(" " "'" "`" "," "" "\"" "@" "[" "]" "{" "}"))
 
-(defvar dd-inject-clear-before
-  '(" " "(" "'" "`" "," "" "\"" "@" "[" "]" "{" "}"))
+;; (defvar dd-inject-clear-before
+;;   '(" " "(" "'" "`" "," "" "\"" "@" "[" "]" "{" "}"))
 
-(defvar dd-inject-clear-after
-  '(")" (string #\newline)))
+;; (defvar dd-inject-clear-after
+;;   '(")" (string #\newline)))
 
-(defvar dd-inject-paste-before
-  '(" " ")" "'" "`" "," "" "\"" "@" "[" "]" "{" "}" ";"))
+;; (defvar dd-inject-paste-before
+;;   '(" " ")" "'" "`" "," "" "\"" "@" "[" "]" "{" "}" ";"))
 
 (defun dd-inject (str)
   "Injects a symbol safely"
@@ -200,7 +200,8 @@ This command assumes point is not in a string or comment."
           (print 3)
           (insert str))
          ;; OK before
-         ((member* ops dd-inject-clear-before :test #'equal)
+         ((string-match-p "[\s\\(\\'\\`\\,\\@\\{\\}]" ops)
+          ;;(member* ops dd-inject-clear-before :test #'equal)
           (print 4)
           (insert str)
           (unless (string-match-p "[\)\s]" (string (following-char)))
@@ -211,14 +212,16 @@ This command assumes point is not in a string or comment."
          ((string-match-p "[\)\s\n]" ofs)
           ;;(member* ofs dd-inject-clear-after :test #'equal)
           (print 5)
-          (unless (member* (string (preceding-char)) dd-inject-clear-before :test #'equal)
+          (unless (string-match-p "[\s\\(\\'\\`\\,\\@\\{\\}]" (string (preceding-char)))
+            ;;(member* (string (preceding-char)) dd-inject-clear-before :test #'equal)
             (insert " "))
           (insert str)) 
          ;; blocked both sides; insert after blocked token.
          (t
           (print 6)
-          (re-search-forward "[ \\)\\'\\\"\\`\\,\\@\\{\\}\\;]")
-          (unless (member* (string (preceding-char)) dd-inject-clear-before :test #'equal)
+          (re-search-forward "[\s\\)\\'\\\"\\`\\,\\@\\{\\}\\;]")
+          (unless (string-match-p "[\s\\(\\'\\`\\,\\@\\{\\}]" (string (preceding-char)))
+            ;;(member* (string (preceding-char)) dd-inject-clear-before :test #'equal)
             (insert " "))
           (insert str)
           (insert " ")))))))
