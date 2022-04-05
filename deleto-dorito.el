@@ -84,7 +84,7 @@ This command assumes point is not in a string or comment."
   (make-local-variable 'kill-ring-yank-pointer)
   (let* ((kill-ring kill-ring)
          (select-enable-clipboard nil))
-    (dd-kill-sexp-or-selection arg word)))
+    (dd-kill-sexp-or-selection)))
 
 (defun dd-copy-sexp-or-selection ()
   (interactive)
@@ -210,10 +210,16 @@ This command assumes point is not in a string or comment."
           ;; blocked both sides; insert after blocked token.
           (t
            (re-search-forward "[\s\\)\\'\\\"\\`\\,\\@\\{\\}\\;]")
+           (if (and
+                (< 0 (point))
+                (equal ")" (string (preceding-char))))
+               (backward-char))
            (unless (string-match-p "[\s\\(\\'\\`\\,\\@\\{\\}]" (string (preceding-char)))
              (insert " "))
            (insert str)
-           (insert " ")))))))
+           (unless (or (>= (point) (point-max))
+                       (string-match-p "[\s\\)\\'\\\"\\`\\,\\@\\{\\}\\;]" (string (following-char))))
+             (insert " "))))))))
 
 
 
